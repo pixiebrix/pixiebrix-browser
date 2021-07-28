@@ -17,45 +17,46 @@
 
 import { Transformer } from "@/types";
 import { BlockArg, Schema } from "@/core";
-import { registerBlock } from "@/blocks/registry";
 import { propertiesToSchema } from "@/validators/generic";
+import { registerBlock } from "@/blocks/registry";
 
-export class FormData extends Transformer {
+export class ParseCsv extends Transformer {
   constructor() {
     super(
-      "@pixiebrix/forms/data",
-      "Read data from a form",
-      "Read data from all inputs on a form"
+      "@pixiebrix/parse/csv",
+      "Parse CSV",
+      "Parse a string as a CSV file",
+      "faCode"
     );
   }
 
   inputSchema: Schema = propertiesToSchema({
-    selector: {
+    content: {
       type: "string",
-      description: "JQuery selector for the form",
+      description: "The contents of the CSV file",
     },
   });
 
-  outputSchema: Schema = {
-    $schema: "https://json-schema.org/draft/2019-09/schema#",
-    type: "object",
-    additionalProperties: true,
-  };
+  outputSchema: Schema = propertiesToSchema({
+    data: {
+      type: "array",
+      description:
+        "The rows of the CSV, with a property for each header/column",
+      items: {
+        type: "object",
+        additionalProperties: true,
+      },
+    },
+  });
 
-  async transform({ selector }: BlockArg): Promise<Record<string, unknown>> {
-    const result: Record<string, unknown> = {};
-    $(document)
-      // eslint-disable-next-line unicorn/no-array-callback-reference -- false positive for jquery
-      .find(selector)
-      .find(":input")
-      .each(function () {
-        const name = $(this).attr("name") ?? "";
-        if (name !== "") {
-          result[name] = $(this).val();
-        }
-      });
-    return result;
+  async transform({ content }: BlockArg): Promise<unknown> {
+    const { default: Papa } = await import("papaparse");
+    const { data } = await Papa.parse(content);
+
+    return {
+      data,
+    };
   }
 }
 
-registerBlock(new FormData());
+registerBlock(new ParseCsv());

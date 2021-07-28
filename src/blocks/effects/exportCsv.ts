@@ -63,7 +63,7 @@ export class ExportCsv extends Effect {
 
     const csvExporter = new ExportToCsv({
       useKeysAsHeaders: true,
-      filename: filename,
+      filename,
       useBom: useBOM,
     });
 
