@@ -83,7 +83,7 @@
     "one-mutation": "^2.0.0",
     "p-defer": "^4.0.0",
     "p-timeout": "^5.0.0",
-    "p-wait-for": "^3.2.0",
+    "p-wait-for": "^4.1.0",
     "page-metadata-parser": "^1.1.4",
     "primeicons": "^4.1.0",
     "primereact": "^6.4.1",
