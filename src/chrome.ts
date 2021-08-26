@@ -25,8 +25,6 @@ import { forbidBackgroundPage, forbidContext } from "./utils/expectContext";
 const CHROME_EXTENSION_ID = process.env.CHROME_EXTENSION_ID;
 const CHROME_EXTENSION_STORAGE_KEY = "chrome_extension_id";
 
-type StorageLocation = "local" | "sync";
-
 export class RequestError extends Error {
   readonly response: unknown;
 
@@ -105,27 +103,38 @@ export class RuntimeNotFoundError extends Error {
 }
 
 /**
- * @deprecated use browser.storage directly
+ * @deprecated Use `readStorage` instead
  */
-export async function readStorage<T = unknown>(
-  storageKey: string,
-  storageType: StorageLocation = "local"
-): Promise<T> {
-  const result = await browser.storage[storageType].get(storageKey);
-  return result[storageKey];
-}
-
-/**
- * @deprecated use browser.storage directly
- */
-export async function setStorage(
-  storageKey: string,
-  value: string,
-  storageType: StorageLocation = "local"
-): Promise<void> {
-  if (typeof value !== "string") {
-    throw new TypeError("Expected string value");
+export async function readStorageWithMigration<
+  T extends Record<string, unknown>
+>(storageKey: string, defaultValue?: Partial<T>): Promise<T | undefined> {
+  const storedValue = await readStorage<T>(storageKey, defaultValue);
+  if (typeof storedValue !== "string") {
+    // No migration necessary
+    return storedValue;
   }
 
-  await browser.storage[storageType].set({ [storageKey]: value });
+  const parsedValue = JSON.parse(storedValue) as T;
+  await browser.storage.local.set({ [storageKey]: parsedValue });
+  return parsedValue;
+}
+
+export async function readStorage<T = unknown>(
+  storageKey: string,
+  defaultValue?: Partial<T>
+): Promise<T | undefined> {
+  const result = await browser.storage.local.get({
+    [storageKey]: defaultValue,
+  });
+  if (storageKey in result) {
+    // eslint-disable-next-line security/detect-object-injection -- Just checked with `in`
+    return result[storageKey];
+  }
+}
+
+export async function setStorage(
+  storageKey: string,
+  value: unknown
+): Promise<void> {
+  await browser.storage.local.set({ [storageKey]: value });
 }

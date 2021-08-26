@@ -15,26 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { browser } from "webextension-polyfill-ts";
 import {
   migrateExtensionsShape,
   migrateActiveExtensions,
   ExtensionOptionsState,
 } from "@/store/extensions";
+import { readStorageWithMigration, setStorage } from "@/chrome";
 
 const STORAGE_KEY = "persist:extensionOptions";
-const INITIAL_STATE = JSON.stringify({});
+const INITIAL_STATE = {};
 
 type JSONString = string;
 
 type RawOptionsState = Record<string, JSONString>;
 
 async function getOptionsState(): Promise<RawOptionsState> {
-  // eslint-disable-next-line security/detect-object-injection -- constant storage key
-  const rawOptions = (await browser.storage.local.get(STORAGE_KEY))[
-    STORAGE_KEY
-  ];
-  return JSON.parse((rawOptions as string) ?? INITIAL_STATE);
+  return readStorageWithMigration(STORAGE_KEY, INITIAL_STATE);
 }
 
 /**
@@ -56,11 +52,9 @@ export async function loadOptions(): Promise<ExtensionOptionsState> {
  */
 export async function saveOptions(state: ExtensionOptionsState): Promise<void> {
   const base = await getOptionsState();
-  await browser.storage.local.set({
+  await setStorage(STORAGE_KEY, {
+    ...base,
     // The redux persist layer persists the extensions value as as JSON-string
-    [STORAGE_KEY]: JSON.stringify({
-      ...base,
-      extensions: JSON.stringify(state.extensions),
-    }),
+    extensions: JSON.stringify(state.extensions),
   });
 }

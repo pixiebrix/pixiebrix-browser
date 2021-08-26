@@ -52,7 +52,7 @@ async function uid(): Promise<string> {
     return _uid;
   }
 
-  let uuid: string = await readStorage<string>(UUID_STORAGE_KEY);
+  let uuid = await readStorage<boolean | string>(UUID_STORAGE_KEY);
   if (!uuid || typeof uuid !== "string") {
     uuid = uuidv4();
     await setStorage(UUID_STORAGE_KEY, uuid);
@@ -64,7 +64,7 @@ async function uid(): Promise<string> {
 
 export async function _toggleDNT(enable: boolean): Promise<boolean> {
   _dnt = enable;
-  await browser.storage.local.set({ [DNT_STORAGE_KEY]: enable });
+  await setStorage(DNT_STORAGE_KEY, enable);
   return enable;
 }
 

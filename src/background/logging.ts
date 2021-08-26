@@ -25,7 +25,7 @@ import { DBSchema, openDB } from "idb/with-async-ittr";
 import { reverse, sortBy, isEmpty } from "lodash";
 import { _getDNT } from "@/background/telemetry";
 import { isContentScript } from "webext-detect-page";
-import { readStorage, setStorage } from "@/chrome";
+import { readStorageWithMigration, setStorage } from "@/chrome";
 import {
   hasBusinessRootCause,
   hasCancelRootCause,
@@ -328,15 +328,13 @@ export async function _getLoggingConfig(): Promise<LoggingConfig> {
     return _config;
   }
 
-  const raw = await readStorage<string>(LOG_CONFIG_STORAGE_KEY);
-  _config = raw ? JSON.parse(raw) : {};
-  return _config;
+  return readStorageWithMigration(LOG_CONFIG_STORAGE_KEY, {});
 }
 
 export async function _setLoggingConfig(config: LoggingConfig): Promise<void> {
   expectBackgroundPage();
 
-  await setStorage(LOG_CONFIG_STORAGE_KEY, JSON.stringify(config));
+  await setStorage(LOG_CONFIG_STORAGE_KEY, config);
   _config = config;
 }
 

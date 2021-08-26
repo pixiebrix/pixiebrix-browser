@@ -19,6 +19,7 @@ import { browser } from "webextension-polyfill-ts";
 import Cookies from "js-cookie";
 import { updateAuth as updateRollbarAuth } from "@/telemetry/rollbar";
 import { isEqual } from "lodash";
+import { readStorageWithMigration, setStorage } from "@/chrome";
 
 const STORAGE_EXTENSION_KEY = "extensionKey";
 
@@ -58,20 +59,7 @@ export function readAuthFromWebsite(): AuthData {
 }
 
 async function readAuthData(): Promise<AuthData | Partial<AuthData>> {
-  const storage = await browser.storage.local.get({
-    [STORAGE_EXTENSION_KEY]: {},
-  });
-  // eslint-disable-next-line security/detect-object-injection -- Local constant
-  const data = storage[STORAGE_EXTENSION_KEY];
-
-  // TODO: Migration only; Drop at some point (Added August 18th 2021)
-  if (typeof data === "string") {
-    const parsed = JSON.parse(data);
-    await browser.storage.local.set({ [STORAGE_EXTENSION_KEY]: parsed });
-    return parsed;
-  }
-
-  return data;
+  return readStorageWithMigration(STORAGE_EXTENSION_KEY, {});
 }
 
 export async function getExtensionToken(): Promise<string | undefined> {
@@ -120,6 +108,6 @@ export async function updateExtensionAuth(
   }
 
   console.debug(`Setting extension auth for ${auth.email}`, auth);
-  await browser.storage.local.set({ [STORAGE_EXTENSION_KEY]: auth });
+  await setStorage(STORAGE_EXTENSION_KEY, auth);
   return true;
 }

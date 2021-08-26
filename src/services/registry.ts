@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { readStorage } from "@/chrome";
+import { readStorageWithMigration } from "@/chrome";
 import BaseRegistry from "@/baseRegistry";
 import { fromJS } from "@/services/factory";
 import { RawServiceConfiguration, RegistryId } from "@/core";
@@ -32,16 +32,17 @@ const registry = new BaseRegistry<RegistryId, Service>(
 export async function readRawConfigurations(): Promise<
   RawServiceConfiguration[]
 > {
-  const rawConfigs = await readStorage(storageKey);
-
-  if (!rawConfigs) {
+  const base = await readStorageWithMigration(storageKey);
+  if (!base?.configured) {
     return [];
   }
 
-  // Not really sure why the next level down is escaped JSON?
-  const base = JSON.parse(rawConfigs as string);
-  const configured = JSON.parse(base.configured);
-  return Object.values(configured);
+  if (typeof base.configured === "string") {
+    // Not really sure why the next level down is escaped JSON?
+    return Object.values(JSON.parse(base.configured));
+  }
+
+  return Object.values(base.configured);
 }
 
 export default registry;
