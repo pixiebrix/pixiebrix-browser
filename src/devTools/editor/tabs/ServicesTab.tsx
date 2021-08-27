@@ -19,8 +19,7 @@ import React, { useCallback, useState } from "react";
 import { Button, Tab, Table } from "react-bootstrap";
 import { FieldArray, useField } from "formik";
 import { ServiceDependency } from "@/core";
-import { DependencyRow } from "@/options/pages/extensionEditor/ServicesFormCard";
-import { useAuthOptions } from "@/options/pages/extensionEditor/ServiceAuthSelector";
+import DependencyRow from "./DependencyRow";
 import { head } from "lodash";
 import { ServiceDefinition } from "@/types/definitions";
 import ServiceModal from "@/components/fields/ServiceModal";
@@ -33,6 +32,7 @@ import { browser } from "webextension-polyfill-ts";
 import { useToasts } from "react-toast-notifications";
 
 import "./ServicesTab.scss";
+import { useAuthOptions } from "@/hooks/auth";
 
 function defaultOutputKey(serviceId: string): string {
   const match = PACKAGE_REGEX.exec(serviceId);

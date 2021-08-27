@@ -42,16 +42,13 @@ import {
   Button,
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import registry from "@/extensionPoints/registry";
 import { Link } from "react-router-dom";
 import AuthContext from "@/auth/AuthContext";
 import { orderBy, uniq, compact, sortBy, isEmpty } from "lodash";
-import BlockModal from "@/components/fields/BlockModal";
-import { useAsyncState } from "@/hooks/common";
 import Select from "react-select";
 import { Kind, PACKAGE_NAME_REGEX } from "@/registry/localRegistry";
 import { WorkshopState, workshopSlice } from "@/options/slices";
-import { useDispatch, useSelector } from "react-redux";
+import { connect, useDispatch, useSelector } from "react-redux";
 
 const { actions } = workshopSlice;
 
@@ -62,6 +59,7 @@ import { useTitle } from "@/hooks/title";
 import { Brick } from "@/types/contract";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import useFetch from "@/hooks/useFetch";
+import { push } from "connected-react-router";
 
 interface OwnProps {
   navigate: (url: string) => void;
@@ -374,7 +372,6 @@ const CustomBricksCard: React.FunctionComponent<
 const WorkshopPage: React.FunctionComponent<OwnProps> = ({ navigate }) => {
   useTitle("Workshop");
   const { isLoggedIn, flags } = useContext(AuthContext);
-  const [extensionPoints] = useAsyncState(registry.all(), []);
 
   return (
     <div>
@@ -390,38 +387,27 @@ const WorkshopPage: React.FunctionComponent<OwnProps> = ({ navigate }) => {
           )}
         </p>
       </div>
-      <Row>
-        <Col md="12" lg="8">
-          <BlockModal
-            blocks={extensionPoints}
-            caption="Select foundation"
-            renderButton={({ show }) => (
-              <Button variant="info" onClick={show}>
-                <FontAwesomeIcon icon={faCube} /> Use Foundation
+      {isLoggedIn && (
+        <>
+          <Row>
+            <Col md="12" lg="8">
+              <Button
+                variant="info"
+                onClick={() => {
+                  navigate(`/workshop/create/`);
+                }}
+              >
+                <FontAwesomeIcon icon={faPlus} /> Create New Brick
               </Button>
-            )}
-            onSelect={(block) => {
-              navigate(`/workshop/install/${encodeURIComponent(block.id)}`);
-            }}
-          />
-
-          {isLoggedIn && (
-            <Button
-              className="ml-3"
-              variant="info"
-              onClick={() => {
-                navigate(`/workshop/create/`);
-              }}
-            >
-              <FontAwesomeIcon icon={faPlus} /> Create New Brick
-            </Button>
-          )}
-        </Col>
-      </Row>
-
-      {isLoggedIn && <CustomBricksSection navigate={navigate} />}
+            </Col>
+          </Row>
+          <CustomBricksSection navigate={navigate} />
+        </>
+      )}
     </div>
   );
 };
 
-export default WorkshopPage;
+const mapDispatchToProps = { navigate: push };
+
+export default connect(undefined, mapDispatchToProps)(WorkshopPage);

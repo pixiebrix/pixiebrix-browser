@@ -53,12 +53,12 @@ import { selectExtensions } from "@/options/selectors";
 import { OptionsState } from "@/store/extensions";
 import useFetch from "@/hooks/useFetch";
 
-export interface TemplatesProps {
+interface TemplatesProps {
   installedRecipes: Set<RegistryId>;
   installRecipe: InstallRecipe;
 }
 
-export interface FeaturedRecipeDefinition extends RecipeDefinition {
+interface FeaturedRecipeDefinition extends RecipeDefinition {
   feature: {
     featured: true;
     shortName: string;

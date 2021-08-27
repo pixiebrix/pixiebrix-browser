@@ -16,7 +16,6 @@
  */
 
 import React, { useMemo } from "react";
-import { useAuthOptions } from "@/options/pages/extensionEditor/ServiceAuthSelector";
 import { Card, Table } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { RecipeDefinition, ServiceDefinition } from "@/types/definitions";
@@ -29,6 +28,7 @@ import AuthWidget from "@/options/pages/marketplace/AuthWidget";
 import ServiceDescriptor from "@/options/pages/marketplace/ServiceDescriptor";
 import { useField } from "formik";
 import { ServiceAuthPair } from "@/core";
+import { useAuthOptions } from "@/hooks/auth";
 
 interface OwnProps {
   blueprint: RecipeDefinition;

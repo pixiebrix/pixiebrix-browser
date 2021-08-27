@@ -24,7 +24,7 @@ import useFetch from "@/hooks/useFetch";
 import { CloudExtension } from "@/types/contract";
 import Page from "@/layout/Page";
 import ActivateForm from "@/options/pages/activateExtension/ActivateForm";
-import { useAuthOptions } from "@/options/pages/extensionEditor/ServiceAuthSelector";
+import { useAuthOptions } from "@/hooks/auth";
 
 /**
  * Page for activating an extension that's stored in the cloud.

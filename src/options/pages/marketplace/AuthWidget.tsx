@@ -16,9 +16,8 @@
  */
 
 import React, { ComponentType, useCallback, useMemo, useState } from "react";
-import ServiceAuthSelector, {
-  AuthOption,
-} from "@/options/pages/extensionEditor/ServiceAuthSelector";
+import ServiceAuthSelector from "@/components/ServiceAuthSelector";
+import { AuthOption } from "@/auth/authTypes";
 import { useField } from "formik";
 import { useDispatch } from "react-redux";
 import { useAsyncState } from "@/hooks/common";

@@ -16,7 +16,7 @@
  */
 
 import React, { useCallback, useMemo } from "react";
-import { AuthOption } from "@/options/pages/extensionEditor/ServiceAuthSelector";
+import { AuthOption } from "@/auth/authTypes";
 import { CloudExtension } from "@/types/contract";
 import { Form, Formik, FormikProps } from "formik";
 import { useDispatch } from "react-redux";

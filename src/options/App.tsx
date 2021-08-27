@@ -23,7 +23,6 @@ import GridLoader from "react-spinners/GridLoader";
 import Container from "react-bootstrap/Container";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import InstalledPage from "@/options/pages/installed/InstalledPage";
-import ExtensionEditor from "@/options/pages/extensionEditor/ExtensionEditor";
 import ServicesEditor from "@/options/pages/services/ServicesEditor";
 import BrickCreatePage from "@/options/pages/brickEditor/CreatePage";
 import BrickEditPage from "@/options/pages/brickEditor/EditPage";
@@ -56,6 +55,7 @@ import registerContribBlocks from "@/contrib/registerContribBlocks";
 import "@/contrib/editors";
 import DeploymentBanner from "@/options/pages/deployments/DeploymentBanner";
 import { ModalProvider } from "@/components/ConfirmationModal";
+import WorkshopPage from "./pages/workshop/WorkshopPage";
 
 // Register the built-in bricks
 registerBuiltinBlocks();
@@ -115,15 +115,7 @@ const Layout = () => {
                   />
                   <Route exact path="/settings" component={SettingsPage} />
                   <Route path="/services/:id?" component={ServicesEditor} />
-                  <Route exact path="/workshop" component={ExtensionEditor} />
-                  <Route
-                    path="/workshop/install/:extensionPointId/:tab?"
-                    component={ExtensionEditor}
-                  />
-                  <Route
-                    path="/workshop/extensions/:extensionId/:tab?"
-                    component={ExtensionEditor}
-                  />
+                  <Route exact path="/workshop" component={WorkshopPage} />
                   <Route
                     exact
                     path="/workshop/create/"

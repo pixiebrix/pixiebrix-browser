@@ -22,6 +22,7 @@ import {
   faCaretDown,
   faCaretRight,
   faCheck,
+  faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import AsyncButton from "@/components/AsyncButton";
 import { IExtension, ResolvedExtension } from "@/core";
@@ -29,14 +30,19 @@ import ExtensionRow from "@/options/pages/installed/ExtensionRow";
 import useNotifications from "@/hooks/useNotifications";
 import useExtensionPermissions from "@/options/pages/installed/useExtensionPermissions";
 import useUserAction from "@/hooks/useUserAction";
-import { RemoveAction } from "@/options/pages/installed/installedPageTypes";
+import {
+  ExportBlueprintAction,
+  RemoveAction,
+} from "@/options/pages/installed/installedPageTypes";
 import CloudExtensionRow from "@/options/pages/installed/CloudExtensionRow";
+import EllipsisMenu from "@/components/ellipsisMenu/EllipsisMenu";
 
 const RecipeEntry: React.FunctionComponent<{
   recipeId: string;
   extensions: ResolvedExtension[];
   onRemove: RemoveAction;
-}> = ({ recipeId, extensions, onRemove }) => {
+  onExportBlueprint: ExportBlueprintAction;
+}> = ({ recipeId, extensions, onRemove, onExportBlueprint }) => {
   const notify = useNotifications();
 
   const recipe = extensions[0]._recipe;
@@ -113,15 +119,21 @@ const RecipeEntry: React.FunctionComponent<{
           <th className="py-2">{label}</th>
           <th className="py-2">{status}</th>
           <th>
-            <AsyncButton
-              variant="danger"
-              size="sm"
-              onClick={async () => {
-                await removeMany(extensions);
-              }}
-            >
-              Uninstall
-            </AsyncButton>
+            <EllipsisMenu
+              items={[
+                {
+                  title: (
+                    <>
+                      <FontAwesomeIcon icon={faTimes} /> Uninstall
+                    </>
+                  ),
+                  action: async () => {
+                    await removeMany(extensions);
+                  },
+                  className: "text-danger",
+                },
+              ]}
+            />
           </th>
         </tr>
       )}
@@ -133,6 +145,7 @@ const RecipeEntry: React.FunctionComponent<{
               key={extension.id}
               extension={extension}
               onRemove={onRemove}
+              onExportBlueprint={onExportBlueprint}
             />
           ) : (
             <CloudExtensionRow key={extension.id} extension={extension} />

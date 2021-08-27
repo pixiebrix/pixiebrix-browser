@@ -27,7 +27,7 @@ import { faCubes, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { ServiceAuthPair } from "@/core";
 
-export function selectedAuths(values: WizardValues): ServiceAuthPair[] {
+function selectedAuths(values: WizardValues): ServiceAuthPair[] {
   return values.services.filter((x) => x.config);
 }
 

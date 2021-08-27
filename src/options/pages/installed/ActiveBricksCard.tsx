@@ -17,7 +17,10 @@
 
 import React, { useMemo } from "react";
 import { ResolvedExtension } from "@/core";
-import { RemoveAction } from "@/options/pages/installed/installedPageTypes";
+import {
+  ExportBlueprintAction,
+  RemoveAction,
+} from "@/options/pages/installed/installedPageTypes";
 import { groupBy, sortBy } from "lodash";
 import { Card, Col, Row, Table } from "react-bootstrap";
 import RecipeEntry from "@/options/pages/installed/RecipeEntry";
@@ -25,7 +28,8 @@ import RecipeEntry from "@/options/pages/installed/RecipeEntry";
 const ActiveBricksCard: React.FunctionComponent<{
   extensions: ResolvedExtension[];
   onRemove: RemoveAction;
-}> = ({ extensions, onRemove }) => {
+  onExportBlueprint: ExportBlueprintAction;
+}> = ({ extensions, onRemove, onExportBlueprint }) => {
   const recipeExtensions = useMemo(
     () =>
       sortBy(
@@ -46,7 +50,7 @@ const ActiveBricksCard: React.FunctionComponent<{
                 <th>&nbsp;</th>
                 <th>Name</th>
                 <th>Status</th>
-                <th>Uninstall</th>
+                <th>Actions</th>
               </tr>
             </thead>
             {recipeExtensions.map(([recipeId, xs]) => (
@@ -55,6 +59,7 @@ const ActiveBricksCard: React.FunctionComponent<{
                 recipeId={recipeId}
                 extensions={xs}
                 onRemove={onRemove}
+                onExportBlueprint={onExportBlueprint}
               />
             ))}
           </Table>

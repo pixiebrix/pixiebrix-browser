@@ -16,7 +16,7 @@
  */
 
 import React from "react";
-import { AuthOption } from "@/options/pages/extensionEditor/ServiceAuthSelector";
+import { AuthOption } from "@/auth/authTypes";
 import { useField } from "formik";
 import { ServiceDependency } from "@/core";
 import useFetch from "@/hooks/useFetch";

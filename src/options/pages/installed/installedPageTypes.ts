@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ExtensionRef } from "@/core";
+import { ExtensionRef, UUID } from "@/core";
 
 export type RemoveAction = (identifier: ExtensionRef) => void;
+export type ExportBlueprintAction = (extensionIdToExport: UUID) => void;

@@ -16,20 +16,24 @@
  */
 
 import React, { useMemo } from "react";
-import { ExtensionRef, ResolvedExtension } from "@/core";
+import { ResolvedExtension } from "@/core";
 import {
   ExtensionValidationResult,
   useExtensionValidator,
 } from "@/validators/generic";
 import { BeatLoader } from "react-spinners";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faExclamation } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import {
+  faCheck,
+  faDownload,
+  faExclamation,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
 import AsyncButton from "@/components/AsyncButton";
 import useExtensionPermissions from "@/options/pages/installed/useExtensionPermissions";
 import useNotifications from "@/hooks/useNotifications";
-
-type RemoveAction = (identifier: ExtensionRef) => void;
+import EllipsisMenu from "@/components/ellipsisMenu/EllipsisMenu";
+import { ExportBlueprintAction, RemoveAction } from "./installedPageTypes";
 
 function validationMessage(validation: ExtensionValidationResult) {
   let message = "Invalid Configuration";
@@ -56,7 +60,8 @@ function validationMessage(validation: ExtensionValidationResult) {
 const ExtensionRow: React.FunctionComponent<{
   extension: ResolvedExtension;
   onRemove: RemoveAction;
-}> = ({ extension, onRemove }) => {
+  onExportBlueprint: ExportBlueprintAction;
+}> = ({ extension, onRemove, onExportBlueprint }) => {
   const { id, label, extensionPointId } = extension;
   const notify = useNotifications();
 
@@ -95,26 +100,44 @@ const ExtensionRow: React.FunctionComponent<{
     );
   }, [hasPermissions, requestPermissions, validation]);
 
+  const onExport = () => {
+    onExportBlueprint(id);
+  };
+
+  const onUninstall = () => {
+    onRemove({ extensionId: id, extensionPointId });
+    notify.success(`Removed brick ${label ?? id}`, {
+      event: "ExtensionRemove",
+    });
+  };
+
   return (
     <tr>
       <td>&nbsp;</td>
-      <td>
-        <Link to={`/workshop/extensions/${id}`}>{label ?? id}</Link>
-      </td>
+      <td>{label ?? id}</td>
       <td className="text-wrap">{statusElt}</td>
       <td>
-        <AsyncButton
-          variant="danger"
-          size="sm"
-          onClick={() => {
-            onRemove({ extensionId: id, extensionPointId });
-            notify.success(`Removed brick ${label ?? id}`, {
-              event: "ExtensionRemove",
-            });
-          }}
-        >
-          Uninstall
-        </AsyncButton>
+        <EllipsisMenu
+          items={[
+            {
+              title: (
+                <>
+                  <FontAwesomeIcon icon={faDownload} /> Export
+                </>
+              ),
+              action: onExport,
+            },
+            {
+              title: (
+                <>
+                  <FontAwesomeIcon icon={faTimes} /> Uninstall
+                </>
+              ),
+              action: onUninstall,
+              className: "text-danger",
+            },
+          ]}
+        />
       </td>
     </tr>
   );

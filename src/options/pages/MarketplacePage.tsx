@@ -26,7 +26,7 @@ import { selectExtensions } from "@/options/selectors";
 import { RegistryId } from "@/core";
 import { OptionsState } from "@/store/extensions";
 
-export interface MarketplaceProps {
+interface MarketplaceProps {
   installedRecipes: Set<RegistryId>;
   navigate: (url: string) => void;
 }

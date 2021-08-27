@@ -1,4 +1,4 @@
-/*!
+/*
  * Copyright (C) 2021 PixieBrix, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.ServicesFormCard {
-  &.invalid {
-    border: 1px solid #fe7c96;
-  }
+export interface AuthOption {
+  value: string;
+  label: string;
+  serviceId: string;
+  local: boolean;
 }

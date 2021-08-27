@@ -15,13 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {
-  ComponentType,
-  CSSProperties,
-  useCallback,
-  useEffect,
-  useMemo,
-} from "react";
+import React, { ComponentType, CSSProperties, useEffect, useMemo } from "react";
 import { useField } from "formik";
 import { Form } from "react-bootstrap";
 import Select, {
@@ -29,65 +23,8 @@ import Select, {
   MenuListComponentProps,
   StylesConfig,
 } from "react-select";
-import useFetch from "@/hooks/useFetch";
-import { SanitizedAuth } from "@/types/contract";
-import { readRawConfigurations } from "@/services/registry";
-import { useAsyncState } from "@/hooks/common";
-import { RawServiceConfiguration } from "@/core";
 import { PIXIEBRIX_SERVICE_ID } from "@/services/constants";
-
-export interface AuthOption {
-  value: string;
-  label: string;
-  serviceId: string;
-  local: boolean;
-}
-
-function defaultLabel(label: string): string {
-  const normalized = (label ?? "").trim();
-  return normalized === "" ? "Default" : normalized;
-}
-
-export function useAuthOptions(): [AuthOption[], () => Promise<void>] {
-  const [
-    configuredServices,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- clarify which state values ignoring for now
-    _localLoading,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- clarify which state values ignoring for now
-    _localError,
-    refreshLocal,
-  ] = useAsyncState<RawServiceConfiguration[]>(readRawConfigurations);
-
-  const { data: remoteAuths, refresh: refreshRemote } = useFetch<
-    SanitizedAuth[]
-  >("/api/services/shared/?meta=1");
-
-  const authOptions = useMemo(() => {
-    const localOptions = (configuredServices ?? []).map((x) => ({
-      value: x.id,
-      label: `${defaultLabel(x.label)} — Private`,
-      local: true,
-      serviceId: x.serviceId,
-    }));
-
-    const sharedOptions = (remoteAuths ?? []).map((x) => ({
-      value: x.id,
-      label: `${defaultLabel(x.label)} — ${
-        x.organization?.name ?? "✨ Built-in"
-      }`,
-      local: false,
-      serviceId: x.service.config.metadata.id,
-    }));
-
-    return [...localOptions, ...sharedOptions];
-  }, [remoteAuths, configuredServices]);
-
-  const refresh = useCallback(async () => {
-    await Promise.all([refreshRemote(), refreshLocal()]);
-  }, [refreshRemote, refreshLocal]);
-
-  return [authOptions, refresh];
-}
+import { AuthOption } from "@/auth/authTypes";
 
 // CustomStyles.js
 const colors = {
@@ -95,7 +32,7 @@ const colors = {
   divider: "#ebedf2",
 };
 
-export const customStyles: StylesConfig<AuthOption, boolean> = {
+const customStyles: StylesConfig<AuthOption, boolean> = {
   // @ts-expect-error not sure how to pass the genetic argument to the react-select types
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: (base: CSSProperties, state: { selectProps: any }) => {

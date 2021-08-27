@@ -16,9 +16,15 @@
  */
 
 import { fetch } from "@/hooks/fetch";
-import { AuthState } from "@/core";
+import { AuthState, RawServiceConfiguration } from "@/core";
 import { updateAuth as updateRollbarAuth } from "@/telemetry/rollbar";
 import { getUID } from "@/background/telemetry";
+import { AuthOption } from "@/auth/authTypes";
+import { useAsyncState } from "./common";
+import { readRawConfigurations } from "@/services/registry";
+import { SanitizedAuth } from "@/types/contract";
+import { useMemo, useCallback } from "react";
+import useFetch from "./useFetch";
 
 interface OrganizationResponse {
   readonly id: string;
@@ -76,4 +82,50 @@ export async function getAuth(): Promise<AuthState> {
   }
 
   return anonAuth;
+}
+
+function defaultLabel(label: string): string {
+  const normalized = (label ?? "").trim();
+  return normalized === "" ? "Default" : normalized;
+}
+
+export function useAuthOptions(): [AuthOption[], () => Promise<void>] {
+  const [
+    configuredServices,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- clarify which state values ignoring for now
+    _localLoading,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- clarify which state values ignoring for now
+    _localError,
+    refreshLocal,
+  ] = useAsyncState<RawServiceConfiguration[]>(readRawConfigurations);
+
+  const { data: remoteAuths, refresh: refreshRemote } = useFetch<
+    SanitizedAuth[]
+  >("/api/services/shared/?meta=1");
+
+  const authOptions = useMemo(() => {
+    const localOptions = (configuredServices ?? []).map((x) => ({
+      value: x.id,
+      label: `${defaultLabel(x.label)} — Private`,
+      local: true,
+      serviceId: x.serviceId,
+    }));
+
+    const sharedOptions = (remoteAuths ?? []).map((x) => ({
+      value: x.id,
+      label: `${defaultLabel(x.label)} — ${
+        x.organization?.name ?? "✨ Built-in"
+      }`,
+      local: false,
+      serviceId: x.service.config.metadata.id,
+    }));
+
+    return [...localOptions, ...sharedOptions];
+  }, [remoteAuths, configuredServices]);
+
+  const refresh = useCallback(async () => {
+    await Promise.all([refreshRemote(), refreshLocal()]);
+  }, [refreshRemote, refreshLocal]);
+
+  return [authOptions, refresh];
 }

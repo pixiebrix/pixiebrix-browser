@@ -18,7 +18,7 @@
 import React from "react";
 import { FormState } from "@/devTools/editor/editorSlice";
 import { Tab } from "react-bootstrap";
-import RunLogCard from "@/options/pages/extensionEditor/RunLogCard";
+import RunLogCard from "./RunLogCard";
 import { useFormikContext } from "formik";
 
 export const LOGS_EVENT_KEY = "logs";
